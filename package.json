@@ -1,0 +1,40 @@
+{
+  "name": "west81",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+  },
+  "dependencies": {
+    "@truffle/contract": "^4.3.14",
+    "amfe-flexible": "^2.2.1",
+    "core-js": "^2.6.12",
+    "truffle-contract": "^4.0.31",
+    "truffle-hdwallet-provider": "^1.0.17"
+  },
+  "devDependencies": {
+    "babel-eslint": "^10.0.1",
+    "eslint": "^5.16.0"
+  },
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "node": true
+    },
+    "extends": [
+      "eslint:recommended"
+    ],
+    "rules": {},
+    "parserOptions": {
+      "parser": "babel-eslint"
+    }
+  },
+  "postcss": {
+    "plugins": {
+      "autoprefixer": {}
+    }
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions"
+  ]
+}
