@@ -1,4 +1,4 @@
-pragma solidity >=0.4.21 <0.7.0;
+pragma solidity 0.5.16;
 library SafeMath {
 
     function mul(uint256 _a, uint256 _b) internal pure returns (uint256 c) {
@@ -12,6 +12,7 @@ library SafeMath {
     }
 
     function div(uint256 _a, uint256 _b) internal pure returns (uint256) {
+        assert(_b > 0);
         return _a / _b;
     }
 
@@ -43,7 +44,7 @@ contract BasicToken is ERC20Basic {
         return totalSupply_;
     }
 
-    function transfer(address _to, uint256 _value) public returns (bool) {
+    function transfer(address _to, uint256 _value) external returns (bool) {
         require(_value <= balances[msg.sender]);
         require(_to != address(0));
 
@@ -76,11 +77,12 @@ contract StandardToken is ERC20, BasicToken {
 
     mapping (address => mapping (address => uint256)) internal allowed;
 
-    function transferFrom(address _from, address _to, uint256 _value) public returns (bool)
+    function transferFrom(address _from, address _to, uint256 _value) external returns (bool)
     {
         require(_value <= balances[_from]);
         require(_value <= allowed[_from][msg.sender]);
         require(_to != address(0));
+        require(_from != address(0), "StandardToken: transfer _from the zero address");
 
         balances[_from] = balances[_from].sub(_value);
         balances[_to] = balances[_to].add(_value);
@@ -89,7 +91,8 @@ contract StandardToken is ERC20, BasicToken {
         return true;
     }
 
-    function approve(address _spender, uint256 _value) public returns (bool) {
+    function approve(address _spender, uint256 _value) external returns (bool) {
+        require(_spender != address(0), "StandardToken: approve _spender the zero address");
         allowed[msg.sender][_spender] = _value;
         emit Approval(msg.sender, _spender, _value);
         return true;
@@ -99,14 +102,16 @@ contract StandardToken is ERC20, BasicToken {
         return allowed[_owner][_spender];
     }
 
-    function increaseApproval(address _spender, uint256 _addedValue) public returns (bool){
+    function increaseApproval(address _spender, uint256 _addedValue) external returns (bool){
+        require(_spender != address(0), "StandardToken: increaseApproval _spender the zero address");
         allowed[msg.sender][_spender] = (
         allowed[msg.sender][_spender].add(_addedValue));
         emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
     }
 
-    function decreaseApproval(address _spender, uint256 _subtractedValue) public returns (bool){
+    function decreaseApproval(address _spender, uint256 _subtractedValue) external returns (bool){
+        require(_spender != address(0), "StandardToken: decreaseApproval _spender the zero address");
         uint256 oldValue = allowed[msg.sender][_spender];
         if (_subtractedValue >= oldValue) {
             allowed[msg.sender][_spender] = 0;
@@ -121,7 +126,7 @@ contract StandardToken is ERC20, BasicToken {
 contract BurnableToken is BasicToken {
 
     event Burn(address indexed burner, uint256 value);
-    function burn(uint256 _value) public {
+    function burn(uint256 _value) external {
         _burn(msg.sender, _value);
     }
 
@@ -134,18 +139,20 @@ contract BurnableToken is BasicToken {
     }
 }
 contract StandardBurnableToken is BurnableToken, StandardToken {
-    function burnFrom(address _from, uint256 _value) public {
+
+    function burnFrom(address _from, uint256 _value) external {
+        require(_from != address(0), "StandardBurnableToken: burnFrom _from the zeroaddress");
         require(_value <= allowed[_from][msg.sender]);
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
         _burn(_from, _value);
     }
 }
 contract West is StandardBurnableToken {
-    string public name = "CRYPTO WEST";
-    string public symbol = "WEST";
-    uint8 public decimals = 18;
+    string public constant name = "CRYPTO WEST";
+    string public constant symbol = "WEST";
+    uint8 public constant decimals = 18;
     constructor() public{
-        totalSupply_ = uint256(100000000).mul(uint256(10)**18);
+        totalSupply_ =  uint256(10**8).mul(uint256(10)**18);
         balances[msg.sender] = totalSupply_;
         emit Transfer(address(0), msg.sender, totalSupply_);
     }
